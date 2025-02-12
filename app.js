@@ -4,7 +4,6 @@ const chalk = require("chalk");
 const path = require("path");
 
 const FILE_PATH = path.join(__dirname,"express.json");
-console.log("File_path",FILE_PATH);
 
 const loadExpenses = () => {
     try {
@@ -29,10 +28,7 @@ program
     .requiredOption("--description <desc>","Expense description")
     .requiredOption("--amount <amount>", "Expense amount")
     .action((options) => {
-        console.log("options", options);
         const {description, amount} = options;
-        console.log("description", description);
-        console.log("amount", amount);
         const parsedAmount = parseFloat(amount);
         if (isNaN(parsedAmount) || parsedAmount <= 0) {
             console.log(chalk.red("Invalid amount"));
@@ -63,5 +59,9 @@ program
             return;
         }
 
-        console.table(chalk.blue(expenses));
+        console.table(expenses);
    });
+
+
+program.parse(process.argv);   // This activates the command-line interface.
+
