@@ -62,6 +62,64 @@ program
         console.table(expenses);
    });
 
+// Delete an expense
+program
+    .command("delete")
+    .description("Delete an expense by id")
+    .requiredOption("--id <id>", "Expense id")
+    .action((options) => {
+        const {id} = options;
+        const expenses = loadExpenses();
+        const filteredExpenses = expenses.filter(expense => expense.id !== parseInt(id));
+
+        if (filteredExpenses.length === expenses.length) {
+            console.log(chalk.red("Expense not found"));
+            return;
+        }
+
+        saveExpenses(filteredExpenses);
+        console.log(chalk.green("Expense deleted successfully"));
+    })
+
+// show total summary
+program
+    .command("summary")
+    .description("Show total expenses")
+    .action(()=>{
+        const expenses = loadExpenses();
+        if (expenses.length === 0) {
+            console.log(chalk.yellow("No expenses found"));
+            return;
+        }
+        const total = expenses.reduce((acc, expense) => acc + expense.amount, 0);
+        console.log(chalk.blue(`Total expenses: ${total}`));
+    })
+
+// show summary by month
+program
+    .command("summary-month")
+    .description("Show total expenses for a specific month")
+    .requiredOption("--month <month>", "Month (1-12)")
+    .action((options)=>{
+        const {month} = options;
+        const expenses = loadExpenses();
+        if (expenses.length === 0) {
+            console.log(chalk.yellow("No expenses found"));
+            return;
+        }
+        const filteredExpenses = expenses.filter(expense => {
+            const expenseDate = new Date(expense.date);
+            return expenseDate.getMonth() + 1 === parseInt(month);
+        });
+
+        if (filteredExpenses.length === 0) {
+            console.log(chalk.red("No expenses found for the specified month"));
+            return;
+        }
+
+        const total = filteredExpenses.reduce((acc, expense) => acc + Number(expense.amount),0)
+        console.log(chalk.blue(`Total expenses for month ${month}: ${total}`));
+    })
 
 program.parse(process.argv);   // This activates the command-line interface.
 
